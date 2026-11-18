@@ -8,13 +8,13 @@
 [![A2A](https://img.shields.io/badge/Architecture-A2A%20Multi--Agent-green?style=flat-square)](https://github.com/vfvincentwong2026)
 [![License](https://img.shields.io/badge/License-MIT-yellow?style=flat-square)](LICENSE)
 
-🌐 **核心定位**：一个集成了多源空间资产、新材料知识图谱、**MCP（Model Context Protocol）**服务化标准与 **A2A（Agent-to-Agent）**多智能体蜂群网络的头部空间设计与算量引擎。既可作为独立 SaaS 与开发者工具运行，亦可作为垂直业务（如高端别墅全案服务平台 *Nusantara Atelier*）的深度赋能大脑。
+🌐 **核心定位**：一个集成了多源空间资产、新材料知识图谱、**MCP（Model Context Protocol）**服务化标准与 **A2A（Agent-to-Agent）**多智能体蜂群网络的头部空间设计与算量引擎。既可作为独立 SaaS 与开发者工具运行，亦可作为垂直业务（如高端别墅全案服务平台 *Nusantara Atelier*）的深度赋能大脑，完美支持一键部署至 **Cloudflare Pages + Workers** 全球边缘网络。
 
 ---
 
 ## 🏗️ 架构概览 · Architecture
 
-```text
+```
 +-----------------------------------------------------------------------+
 |                    A2A 多智能体协作网络 (Multi-Agent Swarm)             |
 |  [主理建筑师 Agent] <---> [美学与风格 Agent] <---> [材料与工艺 Agent] <---> [造价与BOM Agent] |
@@ -54,7 +54,7 @@
 
 ## 📁 目录结构 · Project Structure
 
-```text
+```
 AetherSpace-Core/
 ├── .github/
 │   └── workflows/          # CI/CD 自动化流水线
@@ -64,7 +64,7 @@ AetherSpace-Core/
 │   ├── a2a-swarm/          # A2A 多智能体通信、状态机与协商工作流
 │   └── spatial-engine/     # 参数化空间搭配、材质替换与 BOM 算量联动逻辑
 ├── apps/
-│   ├── playground/         # 独立调试与测试前端（Next.js 14）
+│   ├── playground/         # 独立调试与测试前端（Next.js 14 / Cloudflare Pages）
 │   └── mcp-host/           # MCP 客户端宿主与联调面板
 ├── data/
 │   ├── taxonomy/           # 标准空间与风格分类树
@@ -76,7 +76,7 @@ AetherSpace-Core/
 
 ---
 
-## 🚀 快速开始 · Getting Started
+## 🚀 快速开始与部署 · Getting Started & Deployment
 
 ### 1. 环境准备
 确保本机已安装：
@@ -85,7 +85,7 @@ AetherSpace-Core/
 
 ### 2. 克隆与安装依赖
 ```bash
-git clone https://github.com/vfvincentwong2026/AetherSpace-Core.git
+git clone [https://github.com/vfvincentwong2026/AetherSpace-Core.git](https://github.com/vfvincentwong2026/AetherSpace-Core.git)
 cd AetherSpace-Core
 pnpm install
 ```
@@ -94,6 +94,13 @@ pnpm install
 ```bash
 # 启动所有 workspace 包的监听与 Playground 前端
 pnpm dev
+```
+
+### 4. 部署到 Cloudflare Pages
+项目前端（`apps/playground`）完美适配 Cloudflare 静态与边缘托管：
+```bash
+pnpm build --filter=playground
+# 将输出目录 apps/playground/out 部署至 Cloudflare Pages 即可
 ```
 
 ---
