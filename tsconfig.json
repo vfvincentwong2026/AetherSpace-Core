@@ -1,0 +1,25 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "lib": ["DOM", "DOM.Iterable", "ES2022"],
+    "jsx": "preserve",
+    "strict": true,
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "skipDefaultLibCheck": true,
+    "composite": true,
+    "declaration": true,
+    "declarationMap": true,
+    "sourceMap": true,
+    "paths": {
+      "@aetherspace/core-types": ["packages/core-types/src/index.ts"],
+      "@aetherspace/spatial-engine": ["packages/spatial-engine/src/viewport.tsx"],
+      "@aetherspace/spatial-mcp": ["packages/spatial-mcp/src/index.ts"],
+      "@aetherspace/a2a-swarm": ["packages/a2a-swarm/src/broker.ts"],
+      "@aetherspace/sdk": ["packages/sdk/src/index.ts"]
+    }
+  },
+  "exclude": ["node_modules", "**/dist", "**/.next"]
+}
