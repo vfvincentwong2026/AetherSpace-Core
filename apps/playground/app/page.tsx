@@ -3,25 +3,47 @@
 
 import React, { useState } from 'react';
 import { SpatialViewport } from '@aetherspace/spatial-engine';
+import { SpatialBOMCalculator } from '@aetherspace/spatial-engine/src/bom-calculator';
+import { SEED_MATERIAL_SKUS } from '../../../data/seed/initial-data';
+import { MaterialSKU, BOMItem } from '@aetherspace/core-types';
 
 export default function PlaygroundPage() {
-  const [selectedColor, setSelectedColor] = useState<string>('#C9A96E'); // 默认热带轻奢金/木色
-  const [currentMaterialName, setCurrentMaterialName] = useState<string>('Teak Wood Panel (Ant-Termite)');
-  const [currentCost, setCurrentCost] = useState<number>(145000000); // 1.45 亿 IDR
-  const maxBudget = 140000000; // 1.40 亿 IDR 预算上限
-  const [a2aLog, setA2aLog] = useState<string>('System initialized. A2A Swarm standing by.');
+  // 默认选中的材质
+  const [selectedFloorSku, setSelectedFloorSku] = useState<MaterialSKU>(SEED_MATERIAL_SKUS[1]); // Andesite Stone
+  const [selectedWallSku, setSelectedWallSku] = useState<MaterialSKU>(SEED_MATERIAL_SKUS[0]);     // Teak Wood Panel
+  const [currentMaterialColor, setCurrentMaterialColor] = useState<string>('#C9A96E');
+  const [a2aLog, setA2aLog] = useState<string>('System initialized. A2A Swarm & BOM Calculator active.');
 
-  // 材质切换与联动计算
-  const handleMaterialChange = (color: string, name: string, price: number) => {
-    setSelectedColor(color);
-    setCurrentMaterialName(name);
-    setCurrentCost(price);
+  // 空间物理尺寸模拟 (例如：320平米别墅客厅)
+  const roomDimensions = {
+    floorAreaSqm: 85,
+    wallPerimeterM: 42,
+    ceilingHeightM: 3.5,
+  };
 
-    // 模拟 A2A 自动干预
-    if (price > maxBudget) {
-      setA2aLog(`⚠️ [Cost Controller Agent]: Budget exceeded (${price.toLocaleString()} IDR > ${maxBudget.toLocaleString()} IDR). Triggering A2A negotiation with Material Expert.`);
+  // 实时运行 BOM 算量
+  const bomResult = SpatialBOMCalculator.calculateBOM(roomDimensions, {
+    floorSku: selectedFloorSku,
+    wallSku: selectedWallSku,
+  });
+
+  const maxBudget = 140000000; // 1.4 亿 IDR 预算上限
+
+  // 材质切换交互
+  const handleMaterialSwap = (type: 'floor' | 'wall', sku: MaterialSKU, colorHex: string) => {
+    if (type === 'floor') {
+      setSelectedFloorSku(sku);
     } else {
-      setA2aLog(`✅ [A2A Swarm]: Material updated. Budget within safe limit.`);
+      setSelectedWallSku(sku);
+      setCurrentMaterialColor(colorHex);
+    }
+
+    // 模拟 A2A 校验
+    const estimatedCost = bomResult.totalCostIdr;
+    if (estimatedCost > maxBudget) {
+      setA2aLog(`⚠️ [Cost Controller Agent]: Budget warning! Current total (${estimatedCost.toLocaleString()} IDR) exceeds limit.`);
+    } else {
+      setA2aLog(`✅ [A2A Swarm]: Material updated successfully. BOM re-calculated with waste factor.`);
     }
   };
 
@@ -31,68 +53,78 @@ export default function PlaygroundPage() {
       <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '32px', borderBottom: '1px solid #1F2937', paddingBottom: '20px' }}>
         <div>
           <h1 style={{ fontSize: '24px', fontWeight: 'bold', margin: 0, background: 'linear-gradient(to right, #818CF8, #C084FC)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
-            AetherSpace-Core Playground
+            AetherSpace-Core Studio & BOM Playground
           </h1>
           <p style={{ fontSize: '14px', color: '#9CA3AF', margin: '4px 0 0 0' }}>
-            AI-Native Spatial Intelligence & Three.js / MCP / A2A Live Studio
+            Real-time Three.js Rendering + Automated BOM Calculation + A2A Swarm
           </p>
         </div>
         <div style={{ background: '#1F2937', padding: '6px 14px', borderRadius: '20px', fontSize: '13px', color: '#10B981' }}>
-          🟢 Cloudflare Edge Connected
+          🟢 Engine Online
         </div>
       </header>
 
       {/* 主布局区域 */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 360px', gap: '24px' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 400px', gap: '24px' }}>
         
-        {/* 左侧：Three.js 实时 3D 渲染视口 */}
+        {/* 左侧：3D 视口与 A2A 日志 */}
         <div>
-          <SpatialViewport currentMaterialColor={selectedColor} modelType="villa_living_room" />
+          <SpatialViewport currentMaterialColor={currentMaterialColor} modelType="villa_living_room" />
           
-          {/* 下方：A2A 智能体实时状态日志 */}
           <div style={{ marginTop: '20px', background: '#111827', border: '1px solid #374151', borderRadius: '12px', padding: '16px' }}>
             <h3 style={{ fontSize: '14px', margin: '0 0 8px 0', color: '#93C5FD' }}>🤖 A2A Multi-Agent Swarm Live Log</h3>
             <p style={{ fontSize: '13px', fontFamily: 'monospace', color: '#34D399', margin: 0 }}>{a2aLog}</p>
           </div>
         </div>
 
-        {/* 右侧：控制面板与 BOM 算量联动 */}
-        <div style={{ background: '#111827', border: '1px solid #1F2937', borderRadius: '16px', padding: '24px', display: 'flex', flexDirection: 'column', gap: '24px' }}>
+        {/* 右侧：材质选择与动态 BOM 清单面板 */}
+        <div style={{ background: '#111827', border: '1px solid #1F2937', borderRadius: '16px', padding: '24px', display: 'flex', flexDirection: 'column', gap: '20px' }}>
           
-          {/* 材质选择面板 */}
+          {/* 材质切换 */}
           <div>
-            <h3 style={{ fontSize: '16px', fontWeight: '600', margin: '0 m 12px 0', color: '#E5E7EB' }}>🎨 Material & SKU Swapper</h3>
-            <p style={{ fontSize: '12px', color: '#9CA3AF', marginBottom: '12px' }}>Click to instantly switch materials and trigger real-time BOM calculation.</p>
-            
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+            <h3 style={{ fontSize: '16px', fontWeight: '600', margin: '0 0 10px 0', color: '#E5E7EB' }}>🎨 Material & SKU Swapper</h3>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
               <button 
-                onClick={() => handleMaterialChange('#C9A96E', 'Teak Wood Panel (Tropical)', 135000000)}
-                style={{ background: selectedColor === '#C9A96E' ? '#374151' : '#1F2937', color: '#fff', border: '1px solid #4B5563', padding: '10px 14px', borderRadius: '8px', cursor: 'pointer', textAlign: 'left' }}>
-                🪵 Teak Wood Panel (Safe Budget)
+                onClick={() => handleMaterialSwap('wall', SEED_MATERIAL_SKUS[0], '#C9A96E')}
+                style={{ background: '#1F2937', color: '#fff', border: '1px solid #4B5563', padding: '8px 12px', borderRadius: '8px', cursor: 'pointer', textAlign: 'left', fontSize: '13px' }}>
+                🪵 Wall: Perhutani Teak Wood Panel
               </button>
               <button 
-                onClick={() => handleMaterialChange('#E5E7EB', 'Italian White Marble (Luxury)', 148000000)}
-                style={{ background: selectedColor === '#E5E7EB' ? '#374151' : '#1F2937', color: '#fff', border: '1px solid #4B5563', padding: '10px 14px', borderRadius: '8px', cursor: 'pointer', textAlign: 'left' }}>
-                🏛️ Italian White Marble (Triggers Over-Budget)
+                onClick={() => handleMaterialSwap('wall', SEED_MATERIAL_SKUS[3], '#E5E7EB')}
+                style={{ background: '#1F2937', color: '#fff', border: '1px solid #4B5563', padding: '8px 12px', borderRadius: '8px', cursor: 'pointer', textAlign: 'left', fontSize: '13px' }}>
+                🧱 Wall: Waterproof Microcement
               </button>
             </div>
           </div>
 
-          {/* 算量与造价看板 */}
-          <div style={{ borderTop: '1px solid #1F2937', paddingTop: '20px' }}>
-            <h3 style={{ fontSize: '16px', fontWeight: '600', margin: '0 0 12px 0', color: '#E5E7EB' }}>📊 Real-time BOM & Cost</h3>
-            <div style={{ background: '#1F2937', padding: '14px', borderRadius: '10px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px' }}>
-                <span style={{ color: '#9CA3AF' }}>Active Material:</span>
-                <span style={{ fontWeight: '500' }}>{currentMaterialName}</span>
-              </div>
+          {/* 动态算量 BOM 清单 */}
+          <div style={{ borderTop: '1px solid #1F2937', paddingTop: '16px' }}>
+            <h3 style={{ fontSize: '16px', fontWeight: '600', margin: '0 0 10px 0', color: '#E5E7EB' }}>📊 Live BOM & Cost Engine</h3>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', maxHeight: '200px', overflowY: 'auto' }}>
+              {bomResult.items.map((item: BOMItem, idx: number) => (
+                <div key={idx} style={{ background: '#1F2937', padding: '10px', borderRadius: '8px', fontSize: '12px' }}>
+                  <div style={{ fontWeight: '500', color: '#D1D5DB' }}>{item.itemName}</div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', color: '#9CA3AF', marginTop: '4px' }}>
+                    <span>Qty: {item.quantity} {item.unit}</span>
+                    <span style={{ color: '#F3F4F6' }}>{item.totalPriceIdr.toLocaleString()} IDR</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* 总造价看板 */}
+          <div style={{ borderTop: '1px solid #1F2937', paddingTop: '16px' }}>
+            <div style={{ background: '#1F2937', padding: '14px', borderRadius: '10px', display: 'flex', flexDirection: 'column', gap: '6px' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px' }}>
                 <span style={{ color: '#9CA3AF' }}>Max Budget:</span>
                 <span>{maxBudget.toLocaleString()} IDR</span>
               </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '14px', fontWeight: 'bold', borderTop: '1px solid #374151', paddingTop: '8px', marginTop: '4px' }}>
-                <span style={{ color: '#9CA3AF' }}>Total Cost:</span>
-                <span style={{ color: currentCost > maxBudget ? '#EF4444' : '#10B981' }}>{currentCost.toLocaleString()} IDR</span>
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '15px', fontWeight: 'bold' }}>
+                <span style={{ color: '#9CA3AF' }}>Calculated Total:</span>
+                <span style={{ color: bomResult.totalCostIdr > maxBudget ? '#EF4444' : '#10B981' }}>
+                  {bomResult.totalCostIdr.toLocaleString()} IDR
+                </span>
               </div>
             </div>
           </div>
