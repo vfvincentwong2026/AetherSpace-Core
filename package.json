@@ -1,0 +1,19 @@
+{
+  "name": "aetherspace-core",
+  "private": true,
+  "version": "1.0.0",
+  "description": "AI-Native Spatial Intelligence Core & Multi-Agent Swarm Engine",
+  "packageManager": "pnpm@8.15.0",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "scripts": {
+    "dev": "turbo run dev",
+    "build": "turbo run build",
+    "lint": "turbo run lint"
+  },
+  "devDependencies": {
+    "turbo": "^1.11.3",
+    "typescript": "^5.3.3"
+  }
+}
