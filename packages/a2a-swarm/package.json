@@ -1,0 +1,13 @@
+{
+  "name": "@aetherspace/a2a-swarm",
+  "version": "1.0.0",
+  "private": true,
+  "main": "src/broker.ts",
+  "types": "src/broker.ts",
+  "dependencies": {
+    "@aetherspace/core-types": "workspace:*"
+  },
+  "devDependencies": {
+    "typescript": "^5.3.3"
+  }
+}
